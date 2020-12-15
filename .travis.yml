@@ -1,4 +1,3 @@
-#specify the language travis-ci will observe
 language: python
 python:
   - "3.6"
