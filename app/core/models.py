@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, \
+    BaseUserManager, PermissionsMixin
 
 
 class UserManager(BaseUserManager):
@@ -10,7 +11,8 @@ class UserManager(BaseUserManager):
             raise ValueError('User must have an email!')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
-        user.save(using=self._db)  # using is useful when using multiple databases
+        # using is useful when using multiple databases
+        user.save(using=self._db)
 
         return user
 
