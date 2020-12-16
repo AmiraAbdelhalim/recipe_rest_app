@@ -9,6 +9,7 @@ from rest_framework import status
 
 CREATE_USER_URL = reverse('users:create_user')
 TOKEN_URL = reverse('users:auth_token')
+USER_URL = reverse('users:user')
 # helper function for pieces of code that is going to be used
 # many times
 # **params list of dynamic params
@@ -109,3 +110,47 @@ class publicUserApiTests(TestCase):
         })
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_user_unautherized(self):
+        """test authentication is required for user"""
+        res = self.client.post(USER_URL)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateUserApiTests(TestCase):
+    """test api requests that requires authentication"""
+
+    def setUp(self):
+        self.user = create_user(
+            email='test@xontel.com',
+            password='test123456',
+            name='test'
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_profile_success(self):
+        """test retrieving profile for logged in user"""
+        res = self.client.get(USER_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, {
+            'name': self.user.name,
+            'email': self.user.email
+        })
+
+    def test_post_not_allowed(self):
+        """test post not allowed on the update url"""
+        res = self.client.post(USER_URL, {})
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_update_user_profile(self):
+        """test update authenticated user profile"""
+        payload = {
+            'name': 'New',
+            'password': 'New123456',
+        }
+        res = self.client.patch(USER_URL, payload)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, payload['name'])
+        self.assertTrue(self.user.check_password(payload['password']))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

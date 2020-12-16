@@ -17,9 +17,21 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     # validated_data json in the request
+    # url api/users/create
     def create(self, validated_data):
         """create a new user with encrypted password and return user"""
         return get_user_model().objects.create_user(**validated_data)
+
+    # url api/users/1/update
+    def update(self, instance, validated_data):
+        """update user and return it"""
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
 
 
 class AuthTokenSerializer(serializers.Serializer):
@@ -31,6 +43,7 @@ class AuthTokenSerializer(serializers.Serializer):
         trim_whitespace=False
     )
 
+    # url api/users/token
     def validate(self, attrs):
         """"validate and authenticate user"""
         email = attrs.get('email')
