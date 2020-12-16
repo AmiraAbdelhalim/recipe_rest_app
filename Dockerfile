@@ -5,7 +5,15 @@ ENV PYTHONUNBUFFERED 1
 
 #copy the project requirements into the docker image
 COPY ./requirements.txt /requirements.txt
+#add some postgres requirements before installing requirements
+#--no-cache option for not to add many files and dependencies in the dockerfile
+RUN apk add --update --no-cache postgresql-client
+# --virtual , adds an alias (tmp-build-deps) for dependencies to make it easy to remove them later
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+        gcc libc-dev linux-headers postgresql-dev
 RUN pip install -r /requirements.txt
+# deletes temperory requirements
+RUN apk del .tmp-build-deps
 
 #create empty dir in docker image
 RUN mkdir /app
