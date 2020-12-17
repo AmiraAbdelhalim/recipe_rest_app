@@ -22,7 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
         """create a new user with encrypted password and return user"""
         return get_user_model().objects.create_user(**validated_data)
 
-    # url api/users/1/update
+    # url api/users/user (with access token)
+    # put (update the entire entity)
+    # patch (partial update)
     def update(self, instance, validated_data):
         """update user and return it"""
         password = validated_data.pop('password', None)
