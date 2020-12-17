@@ -44,10 +44,18 @@ class ModelTest(TestCase):
         self.assertTrue(user.is_staff)
 
     def test_tag_str(self):
-        """test tag string representation"""
+        """test tag exists and its string representation is correct👌"""
         tag = models.Tag.objects.create(
             user=sample_user(),
             name='Vegan'
         )
         # assert when tag is converted to string it equals the name
         self.assertEqual(str(tag), tag.name)
+
+    def test_ingredient_str(self):
+        """test ingredient exists and its string representation is correct👌"""
+        ingredient = models.Ingredient.objects.create(
+            user=sample_user(),
+            name="Cucumber"
+        )
+        self.assertEqual(str(ingredient), ingredient.name)
