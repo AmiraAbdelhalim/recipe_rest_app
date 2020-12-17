@@ -21,6 +21,5 @@ class TagViewSet(viewsets.GenericViewSet,
 
     # allows hookup in the create process
     def perform_create(self, serializer):
-        print('SERIALIZER', serializer)
         """create new tag"""
         serializer.save(user=self.request.user)
